@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Diver — Watch</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&family=Raleway:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #060606;
+    color: #e8e4de;
+    font-family: 'Raleway', sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(212,170,100,0.1);
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    font-family: 'Montserrat', serif;
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 0.22em;
+    color: #d4aa64;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .film-title {
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    color: rgba(232,228,222,0.5);
+    max-width: 40%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(212,170,100,0.7);
+    cursor: pointer;
+    background: rgba(212,170,100,0.08);
+    border: 1px solid rgba(212,170,100,0.2);
+    border-radius: 3px;
+    padding: 7px 14px;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .back-btn:hover {
+    background: rgba(212,170,100,0.16);
+    color: #d4aa64;
+    border-color: rgba(212,170,100,0.4);
+  }
+
+  .imdb-badge {
+    font-size: 11px;
+    color: rgba(232,228,222,0.2);
+    letter-spacing: 0.08em;
+    font-family: 'Raleway', sans-serif;
+  }
+
+  .player-wrap {
+    flex: 1;
+    position: relative;
+    background: #000;
+  }
+
+  .player-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* Error state */
+  .error-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background: #060606;
+  }
+
+  .error-screen .code {
+    font-family: 'Montserrat', serif;
+    font-size: 72px;
+    font-weight: 300;
+    color: rgba(212,170,100,0.15);
+    letter-spacing: -0.02em;
+  }
+
+  .error-screen .msg {
+    font-size: 14px;
+    font-weight: 300;
+    color: rgba(232,228,222,0.35);
+    letter-spacing: 0.06em;
+  }
+
+  .error-screen .sub {
+    font-size: 12px;
+    color: rgba(232,228,222,0.2);
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="film-title" id="filmTitle">Loading…</span>
+  <span class="imdb-badge" id="imdbBadge"></span>
+</div>
+
+<div id="playerWrap" class="player-wrap" style="display:none;">
+  <iframe id="playerFrame" referrerpolicy="origin" allowfullscreen></iframe>
+</div>
+
+<div id="errorScreen" class="error-screen" style="display:none;">
+  <div class="code">404</div>
+  <div class="msg">No movie ID provided.</div>
+  <div class="sub">Add ?id=tt1234567 to the URL</div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const imdbID = params.get('id');
+  const type   = params.get('t') || 'movie'; // 'movie' or 'tv'
+
+  if (!imdbID) {
+    document.getElementById('errorScreen').style.display = 'flex';
+    document.getElementById('filmTitle').textContent = 'No ID';
+  } else {
+    document.getElementById('imdbBadge').textContent = "A project from ahmed lol. Use fullscreen for better experience. More features coming soon. ";
+    document.getElementById('playerWrap').style.display = 'block';
+
+    const src = type === 'series'
+      ? `https://vidsrcme.ru/embed/tv?imdb=${imdbID}`
+      : `https://vidsrcme.ru/embed/movie?imdb=${imdbID}`;
+
+    document.getElementById('playerFrame').src = src;
+
+    // Try to fetch title from OMDB
+    fetch(`https://www.omdbapi.com/?apikey=ca776892&i=${imdbID}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.Title) {
+          document.title = `${d.Title} — Diver`;
+          document.getElementById('filmTitle').textContent = d.Title;
+        }
+      })
+      .catch(() => {
+        document.getElementById('filmTitle').textContent = imdbID;
+      });
+  }
+</script>
+</body>
+</html>
