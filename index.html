@@ -529,7 +529,7 @@ async function openModal(imdbID) {
           ? `<img src="${m.Poster}" class="modal-poster" alt="${m.Title}" />      `
           : `<div style="width:120px; height:180px; background:rgba(255,255,255,0.04); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:36px; opacity:0.3; flex-shrink:0;">🎬</div>`
         }
-            <a href="/watch-movie.html?id=${m.imdbID}&t=${m.Type}" target="_blank">
+            <a href="/amadeus-movies/watch-movie.html?id=${m.imdbID}&t=${m.Type}" target="_blank">
             <button class="watch-movie-btn" >WATCH Movie</button>
             </a>
             <hr>
